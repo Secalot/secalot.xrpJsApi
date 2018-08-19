@@ -1,0 +1,84 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Secalot XRP API test page</title>
+  </head>
+  <body>
+    <script src="../dist/bundle.js"></script>
+
+    <fieldset>
+      <legend>Browser U2F support</legend>      
+      <div id="u2fStatus"></div>
+    </fieldset>
+    <br>
+    <fieldset>
+      <legend>Wallet info</legend>      
+      <div id="walletInfo"></div>
+    </fieldset>
+    <br>
+    <form>
+      <fieldset>
+        <legend>Get random</legend>      
+        <button type="button" id="getRandomButton">Get random</button>
+        <input type="text" id="getRandomInput">
+      </fieldset>
+    </form>
+    <br>
+    <form>
+        <fieldset>
+          <legend>Initialize wallet</legend>
+          Private key:<br>
+          <input type="text" id="initWalletPrivateKeyInput">
+          <br>
+          PIN-code:<br>
+          <input type="text" id="initWalletPinInput">
+          <br>
+          <br>
+          <button type="button" id="initWalletButton">Init wallet</button>
+        </fieldset>
+    </form>
+    <br>
+    <form>
+      <fieldset>
+        <legend>Wipeout wallet</legend>
+          <button type="button" id="wipeoutWalletButton">Wipeout wallet</button>
+      </fieldset>
+    </form>
+    <br>
+    <form>
+      <fieldset>
+        <legend>Verify PIN-code</legend>
+        PIN-code:<br>
+        <input type="text" id="verifyPinInput">
+        <br>
+        <br>
+        <button type="button" id="verifyPinButton">Verify PIN-code</button>
+      </fieldset>
+  </form>
+  <br>
+  <form>
+    <fieldset>
+      <legend>Get public key</legend>      
+      <button type="button" id="getPublicKeyButton">Get public key</button>
+      <input type="text" id="getPublicKeyInput">
+    </fieldset>
+  </form>
+  <br>
+  <form>
+    <fieldset>
+      <legend>Sign data</legend>
+      Data to sign:<br>
+      <input type="text" id="signDataDataToSignInput">
+      <br>
+      <br>
+      <button type="button" id="signDataButton">Sign</button>
+      <input type="text" id="signDataSignatureInput">
+    </fieldset>
+</form>
+
+  <div id="statusBar" style="position: fixed; bottom: 0px;">
+  </div>
+  
+
+  </body>
+</html>
