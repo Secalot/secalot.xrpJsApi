@@ -1,3 +1,21 @@
+
+/**
+ * @file Javascript API for the Secalot XRP wallet.<br><br>
+ * The secalot XRP wallet is designed to securely store cryptographic keys corresponding to user's XRP account and to sign XRP transactions.
+ * To sign a transaction, the transaction data is transferred to the device, hashed there and signed. The signature is returned back from the device.<br><br>
+ * Commands and responses between the wallet and the host software can be exchanged via Secalot's CCID smart card interface and via Secalot's U2F interface
+ * via a so called U2F tunneling.
+ * The first is designed to be used by desktop applications and the second is to be used by websites utilizing browser's U2F support.
+ * This api is using the U2F transport.<br><br>
+ * The wallet can be in two states, initialized and wiped. In the wiped state most of wallet's functionality is not available.<br>
+ * The wallet holds one 256 bit ECDSA private key that has to be loaded when the wallet is initialized. The wallet provides a source of random numbers that can be used
+ * to generate the key. In any case the key always comes from the host side so that it can be displayed to the user before being written to the wallet.<br>
+ * Some of wallet's functionality is protected by a PIN-code that has to be set during wallet's initialization. The PIN-code should be between 4 and 32 bytes long.
+ * After wrong PIN-code is presented to a wallet three times in a row, the wallet is permanently wiped and has to be initialized again.
+ * @author Matvey Mukha
+ * @module secalot-xrp-api
+ */
+
 import { isSupported, sign } from 'u2f-api'
 
 function webSafe64 (base64) {
@@ -42,6 +60,19 @@ function sendAPDU (apdu, timeout) {
   })
 }
 
+/**
+ * @typedef {Object} XRPInfo
+ * @property {string} version Secalot XRP wallet version
+ * @property {boolean} walletInitialized Is the wallet initialized
+ * @property {boolean} pinVerified Is the PIN-code verified
+ */
+
+/**
+ * Get info about the Secalot XRP wallet.
+ *
+ * @param {number} timeout Timeout in seconds
+ * @returns {XRPInfo} Secalot XRP wallet info
+ */
 function getInfo (timeout) {
   return new Promise(function (resolve, reject) {
     var apdu = Buffer.from('80C40000', 'hex')
@@ -71,6 +102,13 @@ function getInfo (timeout) {
   })
 }
 
+/**
+ * Get random data
+ *
+ * @param {number} timeout Timeout in seconds
+ * @param {number} length Length of the requested random data. From 1 to 128 bytes.
+ * @returns {Buffer} Random data
+ */
 function getRandom (timeout, length) {
   return new Promise(function (resolve, reject) {
     if ((length === 0) || (length > 128)) {
@@ -103,6 +141,14 @@ function getRandom (timeout, length) {
   })
 }
 
+/**
+ * Initialize the wallet.
+ * Wallet has to be in a wiped state.
+ *
+ * @param {number} timeout Timeout in seconds
+ * @param {string} privateKey The private key. 32 bytes as a hex string.
+ * @param {string} pin A new PIN-code. Between 4 and 32 bytes.
+ */
 function initWallet (timeout, privateKey, pin) {
   return new Promise(function (resolve, reject) {
     privateKey = Buffer.from(privateKey, 'hex')
@@ -155,6 +201,12 @@ function initWallet (timeout, privateKey, pin) {
   })
 }
 
+/**
+ * Wipe out the wallet.
+ * The wallet has to be in an initialized state.
+ *
+ * @param {number} timeout Timeout in seconds
+ */
 function wipeoutWallet (timeout) {
   return new Promise(function (resolve, reject) {
     var apdu = Buffer.from('80F0000000', 'hex')
@@ -183,6 +235,14 @@ function wipeoutWallet (timeout) {
   })
 }
 
+/**
+ * Verify a PIN-code.
+ * The wallet has to be initialized.
+ * After the third unsuccessful verification the wallet is permanently wiped out.
+ *
+ * @param {number} timeout Timeout in seconds
+ * @param {string} pin PIN-code to verify. Between 4 and 32 bytes.
+ */
 function verifyPin (timeout, pin) {
   return new Promise(function (resolve, reject) {
     pin = Buffer.from(pin, 'utf8')
@@ -269,6 +329,13 @@ function getPinTriesLeft (timeout) {
   })
 }
 
+/**
+ * Get the wallet's public key.
+ * The wallet has to be initialized and a PIN-code has to ve verified.
+ *
+ * @param {number} timeout Timeout in seconds
+ * @returns {Buffer} The public key
+ */
 function getPublicKey (timeout) {
   return new Promise(function (resolve, reject) {
     var apdu = Buffer.from('80400000', 'hex')
@@ -302,6 +369,14 @@ function getPublicKey (timeout) {
   })
 }
 
+/**
+ * Sign a transaction.
+ * The wallet has to be initialized and a PIN-code has to ve verified.
+ *
+ * @param {number} timeout Timeout in seconds
+ * @param {string} dataToSign Transaction data to sign. As a hex string.
+ * @returns {Buffer} Signature
+ */
 function signData (timeout, dataToSign) {
   return new Promise(function (resolve, reject) {
     var offset = 0
@@ -375,4 +450,3 @@ function signData (timeout, dataToSign) {
 }
 
 export { isSupported, getInfo, getRandom, initWallet, wipeoutWallet, verifyPin, getPublicKey, signData }
-
