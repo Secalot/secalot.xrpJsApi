@@ -386,7 +386,7 @@ function signData (timeout, dataToSign) {
     rawData = Buffer.from(dataToSign, 'hex')
 
     while (offset !== rawData.length) {
-      var maxChunkSize = 8
+      var maxChunkSize = 128
       var chunkSize = (offset + maxChunkSize > rawData.length ? rawData.length - offset : maxChunkSize)
       var apdu = Buffer.alloc(5 + chunkSize)
       apdu[0] = 0x80
