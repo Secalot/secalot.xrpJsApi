@@ -369,7 +369,7 @@ function getPublicKey (timeout) {
         }
       }
 
-      if (response.length !== 67) {
+      if (response.length !== 35) {
         reject(new Error('Invalid APDU response.'))
         return
       }
