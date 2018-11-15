@@ -146,16 +146,27 @@ function getRandom (timeout, length) {
  * Wallet has to be in a wiped state.
  *
  * @param {number} timeout Timeout in seconds
- * @param {string} privateKey The private key. 32 bytes as a hex string.
+ * @param {string} secretType "privateKey" or "xrpSecret"
+ * @param {string} secret XRP secret, 16 bytes as a hex string or private key, 32 bytes as a hex string.
  * @param {string} pin A new PIN-code. Between 4 and 32 bytes.
  */
-function initWallet (timeout, privateKey, pin) {
+function initWallet (timeout, secretType, secret, pin) {
   return new Promise(function (resolve, reject) {
-    privateKey = Buffer.from(privateKey, 'hex')
+    secret = Buffer.from(secret, 'hex')
     pin = Buffer.from(pin, 'utf8')
 
-    if (privateKey.length !== 32) {
-      reject(new Error('Invalid private key length.'))
+    if (secretType === 'privateKey') {
+      if (secret.length !== 32) {
+        reject(new Error('Invalid secret length.'))
+        return
+      }
+    } else if (secretType === 'xrpSecret') {
+      if (secret.length !== 16) {
+        reject(new Error('Invalid secret length.'))
+        return
+      }
+    } else {
+      reject(new Error('Invalid secret type.'))
       return
     }
 
@@ -164,18 +175,22 @@ function initWallet (timeout, privateKey, pin) {
       return
     }
 
-    var apdu = Buffer.alloc(5 + 1 + privateKey.length + pin.length)
+    var apdu = Buffer.alloc(5 + 1 + secret.length + pin.length)
 
     apdu[0] = 0x80
     apdu[1] = 0x20
     apdu[2] = 0x00
-    apdu[3] = 0x00
-    apdu[4] = 1 + pin.length + privateKey.length
+    if (secretType === 'privateKey') {
+      apdu[3] = 0x00
+    } else {
+      apdu[3] = 0x01
+    }
+    apdu[4] = 1 + pin.length + secret.length
 
     apdu[5] = pin.length
 
     pin.copy(apdu, 6, 0, pin.length)
-    privateKey.copy(apdu, 6 + pin.length, 0, privateKey.length)
+    secret.copy(apdu, 6 + pin.length, 0, secret.length)
 
     sendAPDU(apdu, timeout).then((response) => {
       if (response.length !== 2) {

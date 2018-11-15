@@ -51,10 +51,10 @@ function onClickGetRandom () {
 }
 
 function OnClickInitWallet () {
-  var privateKeyElem = document.getElementById('initWalletPrivateKeyInput')
+  var secretKeyElem = document.getElementById('initWalletSecretKeyInput')
   var pinElem = document.getElementById('initWalletPinInput')
 
-  initWallet(30, privateKeyElem.value, pinElem.value).then(() => {
+  initWallet(30, 'xrpSecret', secretKeyElem.value, pinElem.value).then(() => {
     setStatusBarText('Done')
   })
     .catch((err) => {
