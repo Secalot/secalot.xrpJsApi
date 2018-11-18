@@ -388,7 +388,7 @@ function getPublicKey (timeout) {
  * Sign a transaction.
  * The wallet has to be initialized and a PIN-code has to ve verified.
  *
- * @param {number} timeout Timeout in seconds
+ * @param {number} timeout Timeout in seconds. Should be at least 60 seconds.
  * @param {string} dataToSign Transaction data to sign. As a hex string.
  * @returns {Buffer} Signature
  */
@@ -397,6 +397,11 @@ function signData (timeout, dataToSign) {
     var offset = 0
     var rawData
     var apdus = []
+
+    if (timeout < 60) {
+      reject(new Error('Timeout should be at least 60 seconds.'))
+      return
+    }
 
     rawData = Buffer.from(dataToSign, 'hex')
 
@@ -440,7 +445,11 @@ function signData (timeout, dataToSign) {
 
           sendAPDU(apdu, timeout).then((response) => {
             if ((response[response.length - 2] !== 0x90) || (response[response.length - 1] !== 0x00)) {
-              reject(new Error('Invalid APDU response.'))
+              if ((response[response.length - 2] === 0x64) || (response[response.length - 1] === 0x01)) {
+                reject(new Error('Transaction signing confirmation time expired.'))
+              } else {
+                reject(new Error('Invalid APDU response.'))
+              }
               return
             }
 

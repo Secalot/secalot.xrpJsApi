@@ -97,7 +97,7 @@ function onClickGetPublicKey () {
 function OnClickSignData () {
   var elem = document.getElementById('signDataDataToSignInput')
 
-  signData(30, elem.value).then((signature) => {
+  signData(70, elem.value).then((signature) => {
     var elem = document.getElementById('signDataSignatureInput')
     elem.value = signature.toString('hex')
 
