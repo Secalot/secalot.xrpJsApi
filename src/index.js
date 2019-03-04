@@ -44,10 +44,17 @@ function sendAPDU (apdu, timeout) {
       if (typeof response['signatureData'] !== 'undefined') {
         var data = Buffer.from((normal64(response['signatureData'])), 'base64')
 
-        if (data.length < 2) {
+        if (data.length < 5 + 2) {
           reject(new Error('Invalid response APDU.'))
           return
         }
+
+        if ((data[0] !== 0x01) || (data[1] !== 0x00) || (data[2] !== 0x00) || (data[3] !== 0x00) || (data[4] !== 0x00)) {
+          reject(new Error('Invalid response APDU.'))
+          return
+        }
+
+        data = data.slice(5, data.length)
 
         resolve(data)
       } else {
