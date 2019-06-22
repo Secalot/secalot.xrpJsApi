@@ -158,6 +158,17 @@ function getRandomID (timeout) {
   return new Promise(function (resolve, reject) {
     var apdu = Buffer.from('80E2000000', 'hex')
 
+    getInfo(30).then((info) => {
+      const version = parseFloat(info.version)
+
+      if (version < 0.3) {
+        reject(new Error('Please update your Secalot to firmware version 6 or later.'))
+      }
+    })
+      .catch((err) => {
+        reject(err)
+      })
+
     sendAPDU(apdu, timeout).then((response) => {
       if ((response[response.length - 2] !== 0x90) || (response[response.length - 1] !== 0x00)) {
         if ((response[response.length - 2] === 0x6d) && (response[response.length - 1] === 0x00)) {
