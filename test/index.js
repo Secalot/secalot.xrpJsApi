@@ -1,5 +1,5 @@
 
-import { isSupported, getInfo, getRandom, initWallet, wipeoutWallet, verifyPin, getPublicKey, signData } from '../src/index.js'
+import { isSupported, getInfo, getRandom, getRandomID, initWallet, wipeoutWallet, verifyPin, getPublicKey, signData } from '../src/index.js'
 
 function fillU2fStatus () {
   isSupported().then((result) => {
@@ -42,6 +42,18 @@ function onClickGetRandom () {
   getRandom(30, 16).then((random) => {
     var elem = document.getElementById('getRandomInput')
     elem.value = random.toString('hex')
+
+    setStatusBarText('Done')
+  })
+    .catch((err) => {
+      setStatusBarText(err)
+    })
+}
+
+function onClickGetRandomID () {
+  getRandomID(30).then((randomID) => {
+    var elem = document.getElementById('getRandomIDInput')
+    elem.value = randomID.toString('hex')
 
     setStatusBarText('Done')
   })
@@ -115,6 +127,7 @@ function setStatusBarText (text) {
 
 document.addEventListener('DOMContentLoaded', function (event) {
   document.getElementById('getRandomButton').onclick = onClickGetRandom
+  document.getElementById('getRandomIDButton').onclick = onClickGetRandomID
   document.getElementById('initWalletButton').onclick = OnClickInitWallet
   document.getElementById('wipeoutWalletButton').onclick = OnClickWipeoutWallet
   document.getElementById('verifyPinButton').onclick = OnClickVerifyPin

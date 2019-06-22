@@ -149,6 +149,45 @@ function getRandom (timeout, length) {
 }
 
 /**
+ * Get a random ID
+ *
+ * @param {number} timeout Timeout in seconds
+  * @returns {Buffer} Random ID
+ */
+function getRandomID (timeout) {
+  return new Promise(function (resolve, reject) {
+    var apdu = Buffer.from('80E2000000', 'hex')
+
+    sendAPDU(apdu, timeout).then((response) => {
+      if ((response[response.length - 2] !== 0x90) || (response[response.length - 1] !== 0x00)) {
+        if ((response[response.length - 2] === 0x6d) && (response[response.length - 1] === 0x00)) {
+          reject(new Error('Wallet not initialized.'))
+          return
+        } else if ((response[response.length - 2] === 0x69) && (response[response.length - 1] === 0x82)) {
+          reject(new Error('PIN-code not verified.'))
+          return
+        } else {
+          reject(new Error('Invalid APDU response.'))
+          return
+        }
+      }
+
+      if (response.length !== 10) {
+        reject(new Error('Invalid APDU response.'))
+        return
+      }
+
+      response = response.slice(0, (response.length - 2))
+
+      resolve(response)
+    })
+      .catch((err) => {
+        reject(err)
+      })
+  })
+}
+
+/**
  * Initialize the wallet.
  * Wallet has to be in a wiped state.
  *
@@ -480,4 +519,4 @@ function signData (timeout, dataToSign) {
   })
 }
 
-export { isSupported, getInfo, getRandom, initWallet, wipeoutWallet, verifyPin, getPublicKey, signData }
+export { isSupported, getInfo, getRandom, getRandomID, initWallet, wipeoutWallet, verifyPin, getPublicKey, signData }
