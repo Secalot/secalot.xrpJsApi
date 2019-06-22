@@ -158,7 +158,7 @@ function getRandomID (timeout) {
   return new Promise(function (resolve, reject) {
     var apdu = Buffer.from('80E2000000', 'hex')
 
-    getInfo(30).then((info) => {
+    getInfo(timeout).then((info) => {
       const version = parseFloat(info.version)
 
       if (version < 0.3) {

@@ -1,6 +1,6 @@
 {
   "name": "secalot-xrp-api",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Secalot XRP API",
   "scripts": {
     "devstart": "webpack-dev-server --https --port 443 --mode development",
